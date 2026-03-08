@@ -5,10 +5,12 @@ services:
     container_name: terrame_app
     environment:
       - DISPLAY=${DISPLAY}
+      - XAUTHORITY=${XAUTHORITY:-/root/.Xauthority}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:ro  # autenticação X11
       - ./modelos:/opt/terrame/models
     network_mode: host
-    privileged: true
-    # Comando de teste: apenas ver a versão e sair
-    command: ["-v"]
+    # privileged: true  # evitar se possível, prefira device abaixo
+    devices:
+      - /dev/dri:/dev/dri  # acesso à GPU para OpenGL
