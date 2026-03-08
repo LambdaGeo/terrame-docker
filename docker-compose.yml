@@ -5,7 +5,8 @@ services:
     container_name: terrame_app
     environment:
       - DISPLAY=${DISPLAY}
-      - XAUTHORITY=${XAUTHORITY:-/root/.Xauthority}
+      - LIBGL_ALWAYS_SOFTWARE=1      # ← forçar software rendering
+      - QT_X11_NO_MITSHM=1          # ← desabilitar shared memory X11
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:ro
