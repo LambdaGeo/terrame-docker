@@ -1,0 +1,18 @@
+services:
+  terrame:
+    build: .
+    image: terrame-custom:latest
+    container_name: terrame_app
+    environment:
+      - DISPLAY=${DISPLAY}
+      - LANG=en_US.UTF-8
+      - LC_ALL=en_US.UTF-8
+      - XDG_RUNTIME_DIR=/tmp/runtime-root
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./modelos:/opt/terrame/models
+    network_mode: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    working_dir: /opt/terrame/bin
