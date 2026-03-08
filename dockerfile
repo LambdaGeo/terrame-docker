@@ -8,7 +8,7 @@ FROM ubuntu:18.04
 
 COPY --from=builder /tme_extract /opt/terrame
 
-# Instalamos o básico + o pacote 'libstdc++6' explicitamente
+# Dependências mínimas de sistema para garantir que o X11 e Qt funcionem
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1-mesa-glx libglib2.0-0 libfontconfig1 libxrender1 libdbus-1-3 \
     libx11-6 libxext6 libice6 libsm6 libxt6 libxi6 libxcursor1 \
@@ -21,22 +21,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && locale-gen \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# --- REMOÇÃO DE PLUGINS CONFLITANTES ---
+# O erro SWIG no TerraME geralmente é causado por estes módulos tentando carregar
+# bibliotecas de sistema incompatíveis durante o boot.
+RUN cd /opt/terrame/bin && \
+    rm -f libterralib_mod_postgis.so* libterralib_mod_ogr.so* libpq* libmysql* libterralib_mod_gdal.so*
+
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 ENV TME_PATH=/opt/terrame/bin
 
-# --- O SEGREDO DO ISOLAMENTO ---
-# 1. Definimos o LD_LIBRARY_PATH para ser APENAS a pasta bin do TerraME primeiro
-ENV LD_LIBRARY_PATH=/opt/terrame/bin:/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu
-# 2. Apontamos o QT_PLUGIN_PATH para o lugar certo
-ENV QT_PLUGIN_PATH=/opt/terrame/bin/platforms
-ENV QT_QPA_PLATFORM_PLUGIN_PATH=/opt/terrame/bin/platforms
+# Criamos o diretório de runtime com permissão total
+RUN mkdir -p /tmp/runtime-root && chmod 777 /tmp/runtime-root
+ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 
 WORKDIR /opt/terrame/bin
 
-# Criamos um pequeno script wrapper para garantir que o binário rode no contexto certo
-RUN echo '#!/bin/bash\nexport LD_LIBRARY_PATH=/opt/terrame/bin:$LD_LIBRARY_PATH\n./terrame "$@"' > /entrypoint.sh && \
-    chmod +x /entrypoint.sh
+# CONFIGURAÇÃO DE LIGAÇÃO DE BIBLIOTECAS (CRÍTICO)
+# Forçamos o carregamento prioritário das libs do TerraME
+ENV LD_LIBRARY_PATH=/opt/terrame/bin:/usr/lib/x86_64-linux-gnu
+
+# Criamos um script de entrada que limpa variáveis que podem "sujar" o ambiente
+RUN echo '#!/bin/bash\n\
+unset LD_PRELOAD\n\
+export LD_LIBRARY_PATH=/opt/terrame/bin\n\
+./terrame "$@"' > /entrypoint.sh && chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/opt/terrame/models/hello_world.lua"]
+CMD ["-v"]
