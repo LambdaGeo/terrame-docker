@@ -80,6 +80,20 @@ The 21 functional tests (`lab01` to `lab21`) finish in about 1.5 minutes. On a f
 empty folder the report lists "2 problems": these are the `Lab09Console.txt` and
 `Lab18Console.txt` files that those tests create. They are not simulation failures.
 
+## LuccME goldens (reference results)
+
+`benchmark/` holds year-by-year reference results of TerraME/LuccME, used to validate
+ports of LuccME such as [disslucc](https://github.com/dissmodel/disslucc): the 21
+functional tests of the LuccME package plus two reference scripts that exercise the
+convergence loop. Each golden has the state of every cell at the end of every year, the
+TerraME log and a manifest with versions and hashes. See `benchmark/README.md`.
+
+```bash
+docker build -t terrame-luccme .
+benchmark/generate.sh                      # all 23 goldens (about 3 minutes)
+benchmark/generate.sh lab01 lab15_md10     # only some
+```
+
 ## Graphical interface (Linux host with X11)
 
 ```bash
@@ -99,6 +113,8 @@ host has a GPU, uncomment the `devices: /dev/dri` block.
 ├── entrypoint.sh         # Uses Xvfb when there is no DISPLAY, the host X11 otherwise
 ├── docker-compose.yml    # GUI mode
 ├── luccme/               # LuccME 3.1, pinned copy of TerraME/luccme@6244dd4
+├── benchmark/            # goldens of the LuccME labs + reference scripts and generator
+├── CHANGELOG.md
 └── models/               # hello_world.lua: minimal model to test the image
 ```
 
