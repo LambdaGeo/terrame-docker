@@ -1,117 +1,111 @@
+# TerraME + LuccME in Docker
 
-# TerraME Dockerized
+A ready-to-run Docker image of **[TerraME](https://github.com/TerraME/terrame) 2.0.1** with the
+**[LuccME](https://github.com/TerraME/luccme)** land use change modeling package installed.
 
-This project provides a Docker-based environment to run **TerraME 2.0.1** on modern Linux distributions. It uses a multi-stage build based on Ubuntu 18.04 to resolve legacy dependency issues (like `glibc` and `SWIG` errors) while keeping the final image as light as possible.
+TerraME's official Linux binary was built for Ubuntu 18.04 and no longer runs on current
+distributions. This image packages that binary with everything it needs, so the same model
+runs the same way on any machine with Docker.
 
----
+- **Headless by default:** with no `DISPLAY`, TerraME runs on a virtual X server (Xvfb). This
+  works on servers, in CI, and for batch runs.
+- **Optional GUI:** with an X11 display from the host, the TerraME interface opens normally.
+- **Reproducible:** the TerraME binary is checked against a SHA-256 hash and LuccME is pinned to
+  a fixed commit.
 
-## 📋 Prerequisites
+## What's inside
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-- An X11 server (standard on most Linux desktop distributions)
+| Component | Version |
+|-----------|---------|
+| TerraME   | 2.0.1 (official `ubuntu18` binary) |
+| TerraLib  | 5.5.1 |
+| Lua       | 5.3.4 |
+| Qt        | 5.9.5 |
+| LuccME    | 3.1 (commit `6244dd4`) |
+| Packages  | `base`, `gis`, `luadoc`, `luccme` |
 
+## Build
 
-
-## 📁 Project Structure
-
+```bash
+git clone https://github.com/LambdaGeo/terrame-docker
+cd terrame-docker
+docker build -t terrame-luccme .
 ```
-.
-├── Dockerfile             # Optimized multi-stage build for TerraME
-├── docker-compose.yml     # Handles volume mapping and GUI environment passthrough
-├── models/                # Local folder for Lua scripts and data (synced with container)
-│   └── hello_world.lua    # Example model to get you started
-├── README.md              # This file
-└── .gitignore             # Git ignore rules
+
+## Run a model (headless)
+
+Mount the folder that holds your model to `/work`, which is the container's working
+directory. Output files are written there as well.
+
+```bash
+docker run --rm -v "$PWD":/work terrame-luccme my_model.lua
 ```
 
----
+To make the output files belong to your own user instead of UID 1000:
 
-## 🚀 Quick Start
+```bash
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/work terrame-luccme my_model.lua
+```
 
-### 1. Enable GUI Access
-Before running the container, allow the Docker user to connect to your X11 server:
+Other examples:
+
+```bash
+docker run --rm terrame-luccme                    # prints the versions (default command)
+docker run --rm -v "$PWD/models":/work terrame-luccme hello_world.lua
+```
+
+## Run the LuccME test suite
+
+```bash
+echo 'directory = "functional"' > cfg.lua
+docker run --rm -v "$PWD":/work terrame-luccme -package luccme -test cfg.lua
+```
+
+The 21 functional tests (`lab01` to `lab21`) finish in about 1.5 minutes. The final report
+lists "2 problems": these are the `Lab09Console.txt` and `Lab18Console.txt` files that those
+tests create. They are not simulation failures.
+
+## Graphical interface (Linux host with X11)
 
 ```bash
 xhost +local:docker
+docker compose up --build
+xhost -local:docker    # revoke access when you are done
 ```
 
-> 💡 **Note:** This command grants local Docker processes access to your X server. For enhanced security, consider revoking access afterward with `xhost -local:docker`.
+`docker-compose.yml` mounts `./models` to `/work` and passes your `DISPLAY` through. If your
+host has a GPU, uncomment the `devices: /dev/dri` block.
 
-### 2. Build and Run
-From the project root directory:
+## Project structure
 
-```bash
-docker-compose up --build
+```
+.
+├── dockerfile            # Image: Ubuntu 18.04 + TerraME 2.0.1 + LuccME
+├── entrypoint.sh         # Uses Xvfb when there is no DISPLAY, the host X11 otherwise
+├── docker-compose.yml    # GUI mode
+└── models/               # Example models (hello_world.lua, sir.lua)
 ```
 
-The TerraME graphical interface should launch automatically.
+## Build options
 
----
+| Build arg          | Default | Purpose |
+|--------------------|---------|---------|
+| `TERRAME_VERSION`  | `2.0.1` | TerraME release |
+| `TERRAME_SHA256`   | hash of 2.0.1 | Checksum of the release tarball |
+| `LUCCME_REF`       | `6244dd4…` | LuccME commit to install |
 
-## 📦 Working with Models
+Example: `docker build --build-arg LUCCME_REF=<commit> -t terrame-luccme .`
 
-- Any file placed in the `./models` directory on your host machine will be available inside the container at `/opt/terrame/models`.
-- We included a `hello_world.lua` example in that folder to help you get started.
+## Troubleshooting
 
-### Example Workflow
-```bash
-# Edit your model locally
-nano models/my_model.lua
+- **The container hangs with no output:** do not replace the image entrypoint. It starts under
+  `dumb-init` because `xvfb-run` hangs when it runs as PID 1.
+- **`Could not connect to any X display`:** `DISPLAY` is set, but the container cannot reach
+  the X server. Run `xhost +local:docker`, or unset `DISPLAY` to run headless.
+- **Permission errors in `/work`:** use `--user "$(id -u):$(id -g)"`.
 
-# Run it inside the container (via TerraME GUI or CLI)
-# Inside container path: /opt/terrame/models/my_model.lua
-```
+## License
 
----
+TerraME and LuccME are distributed under LGPL-3.0 by INPE. See their repositories for details.
 
-## 🔧 Troubleshooting
-
-### GUI Not Showing?
-1. Verify your `DISPLAY` environment variable is set:
-   ```bash
-   echo $DISPLAY
-   ```
-   Expected output: `:0` or similar.
-
-2. If needed, explicitly pass the `DISPLAY` variable:
-   ```bash
-   export DISPLAY=:0
-   docker-compose up --build
-   ```
-
-3. Ensure X11 forwarding is enabled (especially on SSH sessions):
-   ```bash
-   ssh -X user@host
-   ```
-
-### Permission Issues?
-If you encounter permission errors when accessing mounted volumes:
-```bash
-# Adjust ownership of the models folder (if needed)
-sudo chown -R $USER:$USER ./models
-```
-
----
-
-## 🧹 Cleanup
-
-To stop the container and remove resources:
-```bash
-docker-compose down
-```
-
-To remove the built image (optional):
-```bash
-docker rmi terrame-dockerized_terrame
-```
-
----
-
-## 📄 License
-
-[Specify your license here, e.g., MIT, Apache 2.0, or "Proprietary"]
-
----
-
-> 💬 **Tip**: Keep your `models/` directory under version control separately if you want to track experiment history independently from the Docker setup.
+Maintained by the [LambdaGeo](https://github.com/LambdaGeo) research group (UFMA).
