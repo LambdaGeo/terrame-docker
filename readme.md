@@ -61,9 +61,9 @@ echo 'directory = "functional"' > cfg.lua
 docker run --rm -v "$PWD":/work terrame-luccme -package luccme -test cfg.lua
 ```
 
-The 21 functional tests (`lab01` to `lab21`) finish in about 1.5 minutes. The final report
-lists "2 problems": these are the `Lab09Console.txt` and `Lab18Console.txt` files that those
-tests create. They are not simulation failures.
+The 21 functional tests (`lab01` to `lab21`) finish in about 1.5 minutes. On a first run in an
+empty folder the report lists "2 problems": these are the `Lab09Console.txt` and
+`Lab18Console.txt` files that those tests create. They are not simulation failures.
 
 ## Graphical interface (Linux host with X11)
 
@@ -83,6 +83,7 @@ host has a GPU, uncomment the `devices: /dev/dri` block.
 ├── dockerfile            # Image: Ubuntu 18.04 + TerraME 2.0.1 + LuccME
 ├── entrypoint.sh         # Uses Xvfb when there is no DISPLAY, the host X11 otherwise
 ├── docker-compose.yml    # GUI mode
+├── luccme/               # LuccME 3.1, pinned copy of TerraME/luccme@6244dd4
 └── models/               # Example models (hello_world.lua, sir.lua)
 ```
 
@@ -92,9 +93,8 @@ host has a GPU, uncomment the `devices: /dev/dri` block.
 |--------------------|---------|---------|
 | `TERRAME_VERSION`  | `2.0.1` | TerraME release |
 | `TERRAME_SHA256`   | hash of 2.0.1 | Checksum of the release tarball |
-| `LUCCME_REF`       | `6244dd4…` | LuccME commit to install |
 
-Example: `docker build --build-arg LUCCME_REF=<commit> -t terrame-luccme .`
+LuccME is not downloaded: it is kept in `luccme/` (unchanged copy of upstream commit `6244dd4`, see `luccme/UPSTREAM.md`) as the reference implementation for validating disslucc.
 
 ## Troubleshooting
 

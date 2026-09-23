@@ -65,15 +65,10 @@ RUN mkdir -p /opt/terrame \
     && tar -xzf /tmp/terrame.tar.gz -C /opt/terrame --strip-components=1 \
     && rm /tmp/terrame.tar.gz
 
-# --- LuccME (pacote TerraME), fixado num commit ---------------------------------
-ARG LUCCME_REF=6244dd461f94259efb6e1d2170d32fc7e28c033c
-ARG LUCCME_URL=https://codeload.github.com/TerraME/luccme/tar.gz/${LUCCME_REF}
-RUN mkdir -p /opt/terrame/bin/packages/luccme \
-    && wget -q "${LUCCME_URL}" -O /tmp/luccme.tar.gz \
-    && tar -xzf /tmp/luccme.tar.gz -C /opt/terrame/bin/packages/luccme --strip-components=1 \
-    && rm /tmp/luccme.tar.gz \
-    # os testes do TerraME gravam logs e saídas dentro da pasta do pacote
-    && chmod -R a+rwX /opt/terrame/bin/packages
+# --- LuccME (cópia fixada em ./luccme, ver luccme/UPSTREAM.md) -------------------
+COPY luccme/ /opt/terrame/bin/packages/luccme/
+# os testes do TerraME gravam logs e saídas dentro da pasta do pacote
+RUN chmod -R a+rwX /opt/terrame/bin/packages
 
 ENV TME_PATH=/opt/terrame/bin \
     PATH=/opt/terrame/bin:$PATH \
