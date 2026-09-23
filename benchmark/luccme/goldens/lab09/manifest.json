@@ -1,0 +1,49 @@
+{
+  "lab": "lab09",
+  "source": {
+    "script": "luccme/tests/functional/lab09.lua",
+    "sha256": "eff981a9f1639ad16200c8da6876c0cb86ef58c403b72b8d984b3f1b44027a4e"
+  },
+  "engine": {
+    "image": "terrame-luccme",
+    "terrame": "2.0.1",
+    "terralib": "5.5.1",
+    "luccme_commit": "6244dd461f94259efb6e1d2170d32fc7e28c033c"
+  },
+  "generator": "benchmark/luccme/harness.lua",
+  "status": "ok",
+  "years": [
+    2008,
+    2014
+  ],
+  "n_cells": 6574,
+  "columns": [
+    "f_out",
+    "d_out",
+    "outros_out",
+    "f_pot",
+    "d_pot",
+    "outros_pot"
+  ],
+  "file": {
+    "name": "lab09.csv.gz",
+    "rows": 46018,
+    "sha256": "a6a34351252687d3b4ffdb8e1de0e8d0173d26f7f9ca7f1561ee20a452eb141f"
+  },
+  "crosscheck_vs_original_output": {
+    "tolerance": 1e-09,
+    "max_abs_diff": {
+      "Lab09_2014.dbf:d_out": 5.000028169277471e-13
+    },
+    "note": "último ano do CSV comparado com o shapefile salvo pelo próprio lab"
+  },
+  "iterations_per_year": {
+    "2008": 0,
+    "2009": 0,
+    "2010": 0,
+    "2011": 0,
+    "2012": 0,
+    "2013": 0,
+    "2014": 0
+  }
+}
