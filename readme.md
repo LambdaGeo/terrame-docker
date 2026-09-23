@@ -47,12 +47,27 @@ To make the output files belong to your own user instead of UID 1000:
 docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/work terrame-luccme my_model.lua
 ```
 
-Other examples:
+## Quick test: hello world
+
+`models/hello_world.lua` is a minimal model with no charts or maps: a 10x10 cellular space
+whose values decay for 10 steps. Use it to check that the image works:
 
 ```bash
-docker run --rm terrame-luccme                    # prints the versions (default command)
+docker run --rm terrame-luccme          # prints the versions (default command)
 docker run --rm -v "$PWD/models":/work terrame-luccme hello_world.lua
 ```
+
+Expected output:
+
+```
+TerraME 2.0.1 rodando no Docker
+Soma inicial: 46.36
+Soma após 10 passos: 16.16
+OK!
+```
+
+The sums change from run to run because the initial values are random. To write your own
+model, copy `hello_world.lua` to a folder, edit it, and mount that folder to `/work`.
 
 ## Run the LuccME test suite
 
@@ -84,7 +99,7 @@ host has a GPU, uncomment the `devices: /dev/dri` block.
 ├── entrypoint.sh         # Uses Xvfb when there is no DISPLAY, the host X11 otherwise
 ├── docker-compose.yml    # GUI mode
 ├── luccme/               # LuccME 3.1, pinned copy of TerraME/luccme@6244dd4
-└── models/               # Example models (hello_world.lua, sir.lua)
+└── models/               # hello_world.lua: minimal model to test the image
 ```
 
 ## Build options
