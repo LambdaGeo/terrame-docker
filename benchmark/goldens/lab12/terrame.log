@@ -23,7 +23,7 @@ demand	d	205	trajectory size	205
 areaAlloc	d	205
 
 Demand allocated correctly in this time: 1999
-[harness] lab12: Lab12, anos 1999..2004, colunas f_out,d_out,o_out,f_pot,d_pot,o_pot
+[harness] lab12: Lab12, years 1999..2004, columns f_out,d_out,o_out,f_pot,d_pot,o_pot
 
 Executing Demand component
 Executing Potential component
@@ -126,8 +126,8 @@ areaAlloc	d	443
 Demand allocated correctly in this time: 2004
 
 Saving Lab12_2004.
-Elapsed time: 00:00:03 hh:mm:ss
+Elapsed time: 00:00:02 hh:mm:ss
 
 End of Simulation
-[harness] lab12: 5 arquivos da saída original em /work/out/lab12
-[harness] lab12: CSV gravado em /work/out/lab12
+[harness] lab12: 5 files of the lab's own output in /work/out/lab12
+[harness] lab12: CSV written to /work/out/lab12

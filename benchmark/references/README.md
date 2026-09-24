@@ -1,39 +1,39 @@
-# Scripts de referência (origem)
+# Reference scripts (provenance)
 
-Scripts do "LuccMe Model Configurator" guardados **sem alteração** (conteúdo idêntico
-byte a byte aos originais), junto com a saída que o TerraME gerou com eles. Até esta
-mudança ficavam no disslucc (`benchmark/reference/` e `benchmark/data/`), onde os números
-de `docs/validation.md` (citados no artigo do JOSS) foram obtidos.
+"LuccMe Model Configurator" scripts kept **unchanged** (byte-for-byte identical to the
+originals), together with the output TerraME produced from them. Until this move they
+lived in disslucc (`benchmark/reference/` and `benchmark/data/`), where the numbers in
+its `docs/validation.md` (cited in the JOSS paper) were obtained.
 
-| Pasta | Scripts | `LuccMEModel.name` | Saída original | Gerado em |
+| Folder | Scripts | `LuccMEModel.name` | Original output | Created |
 |---|---|---|---|---|
-| `lab01_md1643/` | `lab1_main.lua` + `lab1_submodel.lua` | `Lab1` | `LUCCME_Lab1_2014.zip` (`Lab1_2014.*`) | scripts de 2017-09-25, LuccME 3.1 |
-| `lab15_md10/` | `lab6_main.lua` + `lab6_submodel.lua` | `Lab6` | `Lab15_2004.zip` (`Lab15_2004.*`, originalmente `Lab6_2004.*`) | scripts de 2017-05-11, LuccME 3.0 |
+| `lab01_md1643/` | `lab1_main.lua` + `lab1_submodel.lua` | `Lab1` | `LUCCME_Lab1_2014.zip` (`Lab1_2014.*`) | scripts of 2017-09-25, LuccME 3.1 |
+| `lab15_md10/` | `lab6_main.lua` + `lab6_submodel.lua` | `Lab6` | `Lab15_2004.zip` (`Lab15_2004.*`, originally `Lab6_2004.*`) | scripts of 2017-05-11, LuccME 3.0 |
 
-## Relação com os labs do pacote
+## Relation to the package labs
 
-Os labs públicos `luccme/tests/functional/lab01.lua` e `lab15.lua` têm os mesmos
-coeficientes de regressão e a mesma demanda, mas outro `maxDifference`:
+The public labs `luccme/tests/functional/lab01.lua` and `lab15.lua` have the same
+regression coefficients and the same demand, but a different `maxDifference`:
 
-| Cenário | Aqui | `maxDifference` aqui | Lab do pacote | `maxDifference` no pacote |
+| Scenario | Here | `maxDifference` here | Package lab | `maxDifference` in the package |
 |---|---|---|---|---|
-| contínuo (csAC, 2008–2014) | `lab01_md1643` | 1643 | `lab01` | 5000 |
-| discreto (cs_moju, 1999–2004) | `lab15_md10` | 10 | `lab15` | 300 |
+| continuous (csAC, 2008–2014) | `lab01_md1643` | 1643 | `lab01` | 5000 |
+| discrete (cs_moju, 1999–2004) | `lab15_md10` | 10 | `lab15` | 300 |
 
-Com o `maxDifference` do pacote a alocação é aceita na primeira passada em todos os anos;
-com os daqui ela itera (8–26 vezes por ano no contínuo, 56–67 no discreto). Por isso os
-nomes: o número do lab do pacote mais o `maxDifference`.
+With the package's `maxDifference` the allocation is accepted at the first pass in every
+year; with the ones here it iterates (up to 26 times per year in the continuous case, 56–67
+in the discrete one). Hence the names: the package lab number plus the `maxDifference`.
 
-O script discreto se chama `lab6` porque foi exportado como "Lab6" em 2017; no disslucc
-ele era chamado de "Lab15". Aqui ele mantém o nome original, e a pasta leva o número do
-lab do pacote que ele corresponde.
+The discrete script is called `lab6` because it was exported as "Lab6" in 2017; disslucc
+used to call it "Lab15". Here it keeps its original name, and the folder takes the number
+of the package lab it corresponds to.
 
-## Arquivos auxiliares
+## Auxiliary files
 
-- `reference.conf`: lido por `benchmark/generate.sh` (script principal, camada de
-  entrada, saída gravada e saída original para a verificação cruzada).
-- Os scripts leem `../data/cs_ac/csAC.shp` e `../data/cs_moju/cs_moju.shp`; o gerador
-  monta essas pastas a partir de `luccme/data/test/`, que tem os mesmos dados.
-- `lab1_main.lua` tem um bloco de `print` de depuração e um evento `Map`, que exige tela;
-  sem tela, o gerador roda com `-autoclose`. Nenhum dos dois altera o resultado: a saída
-  reproduz `LUCCME_Lab1_2014.zip` (máx. 5e-13).
+- `reference.conf`: read by `benchmark/generate.sh` (main script, input layer, output it
+  writes, and original output for the cross-check).
+- The scripts read `../data/cs_ac/csAC.shp` and `../data/cs_moju/cs_moju.shp`; the
+  generator assembles those folders from `luccme/data/test/`, which holds the same data.
+- `lab1_main.lua` has a debugging `print` block and a `Map` event, which needs a display;
+  without one, the generator runs with `-autoclose`. Neither changes the result: the
+  output reproduces `LUCCME_Lab1_2014.zip` (max. 5e-13).

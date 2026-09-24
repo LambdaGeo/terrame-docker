@@ -24,7 +24,7 @@ d -> 206		demand -> 205 difference -> -1
 o -> 3		demand -> 3 difference -> 0
 
 Demand allocated correctly in this time: 1999
-[harness] lab14: Lab14, anos 1999..2004, colunas f_out,d_out,o_out,f_pot,d_pot,o_pot
+[harness] lab14: Lab14, years 1999..2004, columns f_out,d_out,o_out,f_pot,d_pot,o_pot
 
 Executing Demand component
 Executing Potential component
@@ -132,8 +132,8 @@ o -> 3		demand -> 3 difference -> 0
 Demand allocated correctly in this time: 2004
 
 Saving Lab14_2004.
-Elapsed time: 00:00:03 hh:mm:ss
+Elapsed time: 00:00:02 hh:mm:ss
 
 End of Simulation
-[harness] lab14: 5 arquivos da saída original em /work/out/lab14
-[harness] lab14: CSV gravado em /work/out/lab14
+[harness] lab14: 5 files of the lab's own output in /work/out/lab14
+[harness] lab14: CSV written to /work/out/lab14

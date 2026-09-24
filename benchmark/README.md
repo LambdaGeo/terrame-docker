@@ -1,43 +1,44 @@
-# Goldens do LuccME
+# LuccME goldens
 
-Resultados de referência (goldens) anuais do TerraME/LuccME, para validar ports do
-LuccME (como o [disslucc](https://github.com/dissmodel/disslucc)) algoritmo por
-algoritmo. Há 23 goldens:
+Year-by-year reference results (goldens) of TerraME/LuccME, used to validate ports of
+LuccME (such as [disslucc](https://github.com/DisSModel/disslucc)) one algorithm at a
+time. There are 23 goldens:
 
-- os 21 testes funcionais do pacote (`luccme/tests/functional/lab01.lua` … `lab21.lua`),
-  com a numeração do pacote;
-- 2 referências em `references/` (`lab01_md1643`, `lab15_md10`), que exercitam o laço de
-  convergência (ver abaixo).
+- the 21 functional tests of the package (`luccme/tests/functional/lab01.lua` …
+  `lab21.lua`), with the package's numbering;
+- 2 references in `references/` (`lab01_md1643`, `lab15_md10`) that exercise the
+  convergence loop (see below).
 
-Todos foram gerados pelos scripts **sem edição**, na imagem deste repositório
+All of them were generated from the scripts **unedited**, in this repository's image
 (TerraME 2.0.1, TerraLib 5.5.1, LuccME `6244dd4`).
 
 ```
 benchmark/
-├── generate.sh      # gera goldens/<nome>/ (todos ou alguns)
-├── harness.lua      # roda um lab ou um script solto e grava o estado anual das células
-├── finalize.py      # comprime, confere e escreve o manifest.json
-├── references/      # scripts de referência + saída original do TerraME
-└── goldens/         # 23 goldens: <nome>.csv.gz, terrame.log, manifest.json
+├── generate.sh      # generates goldens/<name>/ (all or some)
+├── harness.lua      # runs a lab or a standalone script and records the yearly cell state
+├── finalize.py      # compresses, cross-checks and writes manifest.json
+├── references/      # reference scripts + original TerraME output
+└── goldens/         # 23 goldens: <name>.csv.gz, terrame.log, manifest.json
 ```
 
-## Conteúdo de `goldens/<lab>/`
+## Contents of `goldens/<name>/`
 
-| Arquivo | Conteúdo |
+| File | Contents |
 |---|---|
-| `<lab>.csv.gz` | estado de cada célula **ao fim de cada ano**: `year,id,col,row`, `<classe>_out` (resultado da alocação) e `<classe>_pot` (potencial) de todas as classes, com 12 casas decimais |
-| `terrame.log` | saída do TerraME: demanda e área alocada por ano, iterações e erro máximo (contínuos) |
-| `manifest.json` | origem (script e SHA-256), versões, colunas, anos, SHA-256 do CSV e a verificação cruzada |
+| `<name>.csv.gz` | state of every cell **at the end of every year**: `year,id,col,row`, `<class>_out` (allocation result) and `<class>_pot` (potential) of every class, 12 decimal places |
+| `terrame.log` | TerraME output: demand and allocated area per year, iterations, maximum error |
+| `manifest.json` | source (script and SHA-256), versions, columns, years, SHA-256 of the CSV, iterations per year and the cross-check |
 
-`col`/`row` são os atributos das células de entrada (`luccme/data/test/csAC.shp` e
-`cs_moju.shp`; no disslucc, `data/input/csAC.zip` e `cs_moju.zip` têm os mesmos valores,
-com a coluna `row` do cs_moju chamada `lin`), então alinham direto com uma grade raster.
+`col`/`row` are the attributes of the input cells (`luccme/data/test/csAC.shp` and
+`cs_moju.shp`; in disslucc, `data/input/csAC.zip` and `cs_moju.zip` hold the same values,
+with cs_moju's `row` column named `lin`), so they map directly onto a raster grid.
 
-Ter os `_pot` separados permite validar o componente de potencial antes da alocação.
+Having `_pot` separately makes it possible to validate the potential component before
+the allocation.
 
-## Labs e componentes
+## Labs and components
 
-| Lab | Dados | Anos | Demanda | Potencial | Alocação |
+| Lab | Data | Years | Demand | Potential | Allocation |
 |---|---|---|---|---|---|
 | lab01 | csAC | 2008–2014 | PreComputedValues | CLinearRegression | CClueLike |
 | lab02 | csAC | 2008–2014 | PreComputedValues | CSpatialLagRegression | CClueLike |
@@ -61,81 +62,80 @@ Ter os `_pot` separados permite validar o componente de potencial antes da aloca
 | lab20 | cs_moju | 1999–2004 | ComputeTwoDates | DLogisticRegressionNeighAttractRepulsion | DClueSLike |
 | lab21 | cs_moju | 1999–2004 | PreComputedValues | DLogisticRegression | DClueSNeighOrdering |
 
-### Referências que exercitam a convergência
+### References that exercise the convergence loop
 
-Os labs do pacote aceitam a primeira alocação em todos os anos (ver abaixo), então não
-testam o laço de convergência. Para isso há duas referências em `references/`: scripts
-do LuccMe Model Configurator (2017) com os mesmos coeficientes e a mesma demanda de
-lab01/lab15, mas `maxDifference` menor. Origem em `references/README.md`.
+The package labs accept the first allocation in every year (see below), so they do not
+test the convergence loop. For that there are two references in `references/`: LuccMe
+Model Configurator scripts (2017) with the same coefficients and demand as lab01/lab15,
+but a smaller `maxDifference`. Provenance in `references/README.md`.
 
-| Golden | Script | `maxDifference` | Iterações por ano | Confere com a saída original |
+| Golden | Script | `maxDifference` | Iterations per year | Matches the original output |
 |---|---|---|---|---|
-| `lab01_md1643` | `lab1_main.lua` + `lab1_submodel.lua` | 1643 (pacote: 5000) | 0, 0, 8, 26, 18, 17, 17 (2008–2014) | `LUCCME_Lab1_2014.zip` (máx. 5e-13) |
-| `lab15_md10` | `lab6_main.lua` + `lab6_submodel.lua` | 10 (pacote: 300) | 0, 67, 56, 56, 61, 61 (1999–2004) | `Lab15_2004.zip` (idêntico) |
+| `lab01_md1643` | `lab1_main.lua` + `lab1_submodel.lua` | 1643 (package: 5000) | 0, 0, 8, 26, 18, 17, 17 (2008–2014) | `LUCCME_Lab1_2014.zip` (max. 5e-13) |
+| `lab15_md10` | `lab6_main.lua` + `lab6_submodel.lua` | 10 (package: 300) | 0, 67, 56, 56, 61, 61 (1999–2004) | `Lab15_2004.zip` (identical) |
 
-As saídas mudam de fato em relação aos labs do pacote: `d_out` difere em 20.075 das
-46.018 células-ano (lab01) e em 681 das 35.484 (lab15), a partir do primeiro ano em
-que há iteração. O número de iterações de cada ano está no `manifest.json`
-(`iterations_per_year`) e serve para comparar com o disslucc.
+Their outputs really do differ from the package labs: `d_out` differs in 20,075 of the
+46,018 cell-years (lab01) and in 681 of the 35,484 (lab15), from the first year with
+iterations on. The iteration count of each year is in `manifest.json`
+(`iterations_per_year`), for comparison with a port.
 
-## Limites destes goldens (leia antes de usar como prova)
+## Limits of these goldens (read before using them as evidence)
 
-- **Nos labs do pacote a alocação não itera.** Nos contínuos com log de iterações
-  (lab01, 02, 04, 05, 07, 08, 09) e nos discretos CLUE-S (lab14–21), todos os anos são
-  aceitos na primeira passada. Esses goldens validam a primeira alocação, **não** o
-  laço de convergência; para isso use `lab01_md1643` e `lab15_md10`.
-- **O `correctCellChange` do CClueLike nunca roda.** A condição dele é
-  `if (cell.regionregionAloc == rNumber)` (`luccme/lua/AllocationCClueLike.lua:503`,
-  erro de digitação de `regionAloc`), sempre falsa. Os goldens contínuos com
-  `CClueLike` refletem o LuccME **sem** essa correção; um port que a implemente vai
-  divergir a partir do primeiro ano com mudança. `CClueLikeSaturation` escreve o nome
-  certo e executa a correção.
-- **lab15, lab16, lab17 e lab20 têm `*_out` idênticos**; lab15–17 também têm `*_pot`
-  idênticos. As demandas `ComputeTwoDates`/`ComputeThreeDates` e o potencial com
-  atração/repulsão não mudam o resultado nesses dados. Bater com um deles não
-  distingue os outros.
-- Os goldens são de engenharia (o port reproduz o TerraME), não de validação
-  científica (ajuste a dados observados).
+- **In the package labs the allocation does not iterate.** In the continuous labs that
+  log iterations (lab01, 02, 04, 05, 07, 08, 09) and in the discrete CLUE-S labs
+  (lab14–21), every year is accepted at the first pass. These goldens validate the first
+  allocation, **not** the convergence loop; use `lab01_md1643` and `lab15_md10` for that.
+- **CClueLike's `correctCellChange` never runs.** Its guard is
+  `if (cell.regionregionAloc == rNumber)` (`luccme/lua/AllocationCClueLike.lua:503`, a
+  typo for `regionAloc`), which is always false. The continuous goldens with `CClueLike`
+  reflect LuccME **without** that correction; a port that implements it will diverge from
+  the first year with change on. `CClueLikeSaturation` spells it correctly and does run
+  the correction.
+- **lab15, lab16, lab17 and lab20 have identical `*_out`**; lab15–17 also have identical
+  `*_pot`. The `ComputeTwoDates`/`ComputeThreeDates` demands and the attraction/repulsion
+  potential do not change the result on these data. Matching one of them does not tell
+  them apart.
+- These goldens are engineering validation (the port reproduces TerraME), not scientific
+  validation (fit to observed data).
 
-## Como foram gerados
+## How they were generated
 
 ```bash
-docker build -t terrame-luccme .           # a imagem deste repositório
-benchmark/generate.sh                      # os 23 (cerca de 3 minutos)
-benchmark/generate.sh lab01 lab15_md10     # só alguns
+docker build -t terrame-luccme .           # this repository's image
+benchmark/generate.sh                      # all 23 (about 3 minutes)
+benchmark/generate.sh lab01 lab15_md10     # only some
 ```
 
-As referências rodam a partir da própria pasta, com `../data/cs_ac/` e `../data/cs_moju/`
-montados a partir de `luccme/data/test/`; o `reference.conf` de cada uma diz qual é o
-script principal, a saída que ele grava e a saída original do TerraME usada na
-verificação cruzada.
+The references run from their own folder, with `../data/cs_ac/` and `../data/cs_moju/`
+assembled from `luccme/data/test/`; each one's `reference.conf` names the main script,
+the output it writes and the original TerraME output used for the cross-check.
 
-`harness.lua` carrega o script do lab (`LAB=labNN`) ou um script solto
-(`SCRIPT=... NAME=...`, rodado na pasta dele) num ambiente próprio e:
+`harness.lua` loads the lab script (`LAB=labNN`) or a standalone script
+(`SCRIPT=... NAME=...`, run from its own folder) in its own environment and:
 
-- **lê o estado das células depois de cada `run()` do modelo, sem escrever nada**. Não
-  se usa o `save` do LuccME para os anos intermediários porque **no LuccME os anos
-  listados em `save.saveYears` alteram a simulação**: nesses anos a alocação troca os
-  valores das classes pelos do ano inicial antes de `cs:synchronize()`, e no ano seguinte
-  `cell.past` fica com os valores errados. Salvar todos os anos pelo `save` muda o
-  `d_out` de 2014 do lab01 em até 0,20 por célula. As saídas originais em
-  `references/` salvam só o ano final e não são afetadas;
-- mantém o `print()` do LuccME, que os labs silenciam, para gerar o log;
-- impede que o lab apague a própria saída do ano final e a usa na verificação cruzada:
-  o último ano do CSV tem que bater com o shapefile salvo pelo script e, nas
-  referências, com a saída original do TerraME guardada em `references/<nome>/`
-  (tolerância 1e-9, campo `crosscheck_vs_original_output` do manifesto);
-- executa a única função do arquivo mesmo se o nome estiver errado: `lab17.lua` do
-  pacote a declara como `lab10` (fica um aviso no log).
+- **reads the state of the cells after each `run()` of the model, writing nothing**. The
+  LuccME `save` is not used for intermediate years because **in LuccME the years listed
+  in `save.saveYears` change the simulation**: in those years the allocation swaps the
+  class values for those of the start year before `cs:synchronize()`, and in the
+  following year `cell.past` holds the wrong values. Saving every year through `save`
+  changes lab01's 2014 `d_out` by up to 0.20 per cell. The original outputs in
+  `references/` save only the final year and are not affected;
+- keeps LuccME's `print()`, which the labs silence, to produce the log;
+- stops the lab from deleting its own final-year output and uses it for the cross-check:
+  the last year of the CSV must match the shapefile saved by the script and, for the
+  references, the original TerraME output kept in `references/<name>/` (tolerance 1e-9,
+  field `crosscheck_vs_original_output` of the manifest);
+- runs the file's only function even if it is misnamed: the package's `lab17.lua`
+  declares it as `lab10` (a warning goes to the log).
 
-**Reprodutibilidade:** o LuccME soma em ordem de `pairs()`, que muda entre execuções e
-altera o último bit (~1e-16). O CSV é gravado com 12 casas decimais, então duas gerações
-coincidem até 1e-12: de uma geração para outra, poucas células (de 0 a 3 por lab nas
-gerações feitas) caem na fronteira do arredondamento e mudam na 12ª casa. **Compare
-sempre com tolerância** (1e-9 basta), não pelo SHA-256 do arquivo, que serve só para
-integridade.
+**Reproducibility:** LuccME sums in `pairs()` order, which changes between runs and
+alters the last bit (~1e-16). The CSV is written with 12 decimal places, so two
+generations agree up to 1e-12: from one generation to the next, a few cells (0 to 3 per
+lab in the generations made so far) fall on a rounding boundary and change in the 12th
+decimal place. **Always compare with a tolerance** (1e-9 is enough), not by the file's
+SHA-256, which is only an integrity check.
 
-## Uso
+## Usage
 
 ```python
 import pandas as pd
@@ -144,5 +144,5 @@ golden = pd.read_csv("benchmark/goldens/lab01_md1643/lab01_md1643.csv.gz")
 ref_2014 = golden[golden["year"] == 2014].set_index(["row", "col"])["d_out"]
 ```
 
-O disslucc guarda uma cópia de `goldens/` em `benchmark/goldens/` e a usa nos testes;
-para atualizá-la, gere aqui e copie a pasta.
+disslucc keeps in its `benchmark/goldens/` a copy of only the goldens its tests use;
+each new golden goes there together with the component and the test that use it.

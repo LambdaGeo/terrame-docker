@@ -18,7 +18,7 @@ d	elas: 	0.10000000001401	dir: 	-1	const: 	0.01431553	->	0.01431553	0	1
 outros	elas: 	0.10000016027163	dir: 	-1	const: 	0	->	0	0	1
 
 Demand allocated correctly in 2008	Number of iterations: 0	Maximum error: 0.01040035000733
-[harness] lab03: Lab03, anos 2008..2014, colunas f_out,d_out,outros_out,f_pot,d_pot,outros_pot
+[harness] lab03: Lab03, years 2008..2014, columns f_out,d_out,outros_out,f_pot,d_pot,outros_pot
 
 Executing Demand component
 Executing Potential component
@@ -111,8 +111,8 @@ outros	elas: 	0.10000016027163	dir: 	0	const: 	0.0	->	0.0	0.0	1.0
 Demand allocated correctly in 2014	Number of iterations: 0	Maximum error: 417.18589488399
 
 Saving Lab03_2014.
-Elapsed time: 00:00:05 hh:mm:ss
+Elapsed time: 00:00:04 hh:mm:ss
 
 End of Simulation
-[harness] lab03: 5 arquivos da saída original em /work/out/lab03
-[harness] lab03: CSV gravado em /work/out/lab03
+[harness] lab03: 5 files of the lab's own output in /work/out/lab03
+[harness] lab03: CSV written to /work/out/lab03

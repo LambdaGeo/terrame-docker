@@ -1,8 +1,8 @@
-"""Finaliza o golden de um lab: comprime o CSV, confere contra a saída original
-do lab e grava manifest.json. Usa só a biblioteca padrão.
+"""Finalizes a lab's golden: compresses the CSV, checks it against the lab's own
+output and writes manifest.json. Standard library only.
 
-Chamado por generate.sh:
-    python3 finalize.py <lab> <workdir> <destino> <imagem>
+Called by generate.sh:
+    python3 finalize.py <lab> <workdir> <destination> <image>
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-TOL = 1e-9  # o CSV tem 12 casas decimais
+TOL = 1e-9  # the CSV has 12 decimal places
 
 
 def sha256(path: Path) -> str:
@@ -26,7 +26,7 @@ def sha256(path: Path) -> str:
 
 
 def read_dbf(path: Path) -> list[dict]:
-    """Leitor mínimo de DBF (dBase III), suficiente para as saídas do TerraME."""
+    """Minimal DBF (dBase III) reader, enough for TerraME outputs."""
     data = path.read_bytes()
     n_records, header_len, record_len = struct.unpack("<xxxxIHH", data[:12])
     fields, pos = [], 32
@@ -75,7 +75,7 @@ def main() -> None:
     dest.mkdir(parents=True, exist_ok=True)
     shutil.copy(work / f"{lab}.log", dest / "terrame.log")
 
-    # GOLDEN_SOURCES: scripts do repositório usados no modo SCRIPT (caminhos relativos à raiz)
+    # GOLDEN_SOURCES: repository scripts used in SCRIPT mode (paths relative to the repository root)
     repo = Path(__file__).resolve().parents[1]
     sources = os.environ.get("GOLDEN_SOURCES")
     if sources:
@@ -97,7 +97,7 @@ def main() -> None:
         manifest["status"] = "failed"
         manifest["error"] = log_tail
         (dest / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
-        print(f"   {lab}: FALHOU -> {' | '.join(log_tail)}")
+        print(f"   {lab}: FAILED -> {' | '.join(log_tail)}")
         return
 
     with csv_path.open() as f:
@@ -106,7 +106,7 @@ def main() -> None:
     years = sorted({int(r["year"]) for r in rows})
     final = {r["id"]: r for r in rows if int(r["year"]) == years[-1]}
 
-    # Verificação cruzada: último ano do CSV x shapefile salvo pelo próprio lab
+    # Cross-check: last year of the CSV vs. the shapefile saved by the lab itself
     crosscheck = {}
     dbfs = sorted(out.glob("*.dbf"))
     for dbf in dbfs:
@@ -124,10 +124,10 @@ def main() -> None:
         shutil.copyfileobj(src, dst)
 
     log = (work / f"{lab}.log").read_text(errors="replace")
-    # contínuo: "Demand allocated correctly in 2014.  Number of iterations: 17"
+    # continuous: "Demand allocated correctly in 2014.  Number of iterations: 17"
     iterations = {y: int(n) for y, n in re.findall(
         r"allocated correctly in (\d{4})\.\s*Number of iterations: (\d+)", log)}
-    # discreto: uma linha "Year: 2004 Iteration -> n" por passada (n começa em 0)
+    # discrete: one "Year: 2004 Iteration -> n" line per pass (n starts at 0)
     for y, n in re.findall(r"Year: (\d{4}) Iteration -> (\d+)", log):
         iterations[y] = max(iterations.get(y, 0), int(n))
     manifest.update({
@@ -139,14 +139,14 @@ def main() -> None:
         "crosscheck_vs_original_output": {
             "tolerance": TOL,
             "max_abs_diff": crosscheck,
-            "note": "último ano do CSV comparado com os .dbf da pasta de saída: a saída do próprio script e, nas referências, a saída original do TerraME",
+            "note": "last year of the CSV compared with the .dbf files of the output folder: the script's own output and, for references, the original TerraME output",
         },
         "iterations_per_year": iterations,
-        "iterations_note": "contínuo: 'Number of iterations' do LuccME; discreto: maior n de 'Iteration -> n' (0 = aceito na 1ª passada)",
+        "iterations_note": "continuous: LuccME's 'Number of iterations'; discrete: largest n in 'Iteration -> n' (0 = first pass accepted)",
     })
     (dest / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
     size_kb = gz.stat().st_size // 1024
-    print(f"   {lab}: {manifest['status']}, anos {years[0]}-{years[-1]}, {len(final)} células, "
+    print(f"   {lab}: {manifest['status']}, years {years[0]}-{years[-1]}, {len(final)} cells, "
           f"{', '.join(columns)}, {size_kb} KB")
 
 

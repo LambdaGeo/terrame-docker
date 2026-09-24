@@ -1,11 +1,12 @@
-# TerraME 2.0.1 + LuccME, pronto para rodar em qualquer Linux/macOS/Windows com Docker.
+# TerraME 2.0.1 + LuccME, ready to run on any Linux/macOS/Windows machine with Docker.
 #
-#   docker run --rm -v "$PWD":/work ghcr.io/lambdageo/terrame meu_modelo.lua
+#   docker build -t terrame-luccme .
+#   docker run --rm -v "$PWD":/work terrame-luccme my_model.lua
 #
-# Sem DISPLAY o TerraME roda sobre um X virtual (Xvfb): serve para servidor, CI e
-# execução em lote. Com DISPLAY (ver docker-compose.yml) abre a interface gráfica.
+# Without DISPLAY, TerraME runs on a virtual X server (Xvfb): servers, CI and batch
+# runs. With DISPLAY (see docker-compose.yml) it opens the graphical interface.
 #
-# O binário oficial do TerraME foi compilado para Ubuntu 18.04, por isso a base.
+# The official TerraME binary was built for Ubuntu 18.04, hence the base image.
 
 FROM ubuntu:18.04
 
@@ -55,7 +56,7 @@ ENV LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
 
-# --- TerraME (binário oficial, verificado por SHA-256) ---------------------------
+# --- TerraME (official binary, checked by SHA-256) --------------------------------
 ARG TERRAME_VERSION=2.0.1
 ARG TERRAME_SHA256=846fa303a6e9dbe1869456e7a525186618595789eec276164b8afbb0ca7e33ed
 ARG TERRAME_URL=https://github.com/TerraME/terrame/releases/download/${TERRAME_VERSION}/terrame-${TERRAME_VERSION}-ubuntu18.tar.gz
@@ -65,9 +66,9 @@ RUN mkdir -p /opt/terrame \
     && tar -xzf /tmp/terrame.tar.gz -C /opt/terrame --strip-components=1 \
     && rm /tmp/terrame.tar.gz
 
-# --- LuccME (cópia fixada em ./luccme, ver luccme/UPSTREAM.md) -------------------
+# --- LuccME (pinned copy in ./luccme, see luccme/UPSTREAM.md) --------------------
 COPY luccme/ /opt/terrame/bin/packages/luccme/
-# os testes do TerraME gravam logs e saídas dentro da pasta do pacote
+# TerraME tests write logs and outputs inside the package folder
 RUN chmod -R a+rwX /opt/terrame/bin/packages
 
 ENV TME_PATH=/opt/terrame/bin \
@@ -80,13 +81,13 @@ RUN chmod 0755 /usr/local/bin/terrame-entrypoint \
     && mkdir -p /work && chown terrame:terrame /work
 
 LABEL org.opencontainers.image.title="TerraME + LuccME" \
-      org.opencontainers.image.description="TerraME 2.0.1 com o pacote LuccME, execução headless ou com interface" \
+      org.opencontainers.image.description="TerraME 2.0.1 with the LuccME package, headless or with a graphical interface" \
       org.opencontainers.image.source="https://github.com/LambdaGeo/terrame-docker" \
       org.opencontainers.image.licenses="LGPL-3.0"
 
 USER terrame
 WORKDIR /work
 
-# dumb-init como PID 1: sem ele o xvfb-run fica travado dentro do container
+# dumb-init as PID 1: without it, xvfb-run hangs inside the container
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/terrame-entrypoint"]
 CMD ["-version"]
