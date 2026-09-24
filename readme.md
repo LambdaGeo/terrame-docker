@@ -41,6 +41,13 @@ directory. Output files are written there as well.
 docker run --rm -v "$PWD":/work terrame-luccme my_model.lua
 ```
 
+A model that opens a `Chart` or a `Map` keeps running after the simulation ends, waiting
+for someone to close the window. Headless, nobody will, so add `-autoclose`:
+
+```bash
+docker run --rm -v "$PWD":/work terrame-luccme -autoclose my_model.lua
+```
+
 To make the output files belong to your own user instead of UID 1000:
 
 ```bash
@@ -60,9 +67,9 @@ docker run --rm -v "$PWD/models":/work terrame-luccme hello_world.lua
 Expected output:
 
 ```
-TerraME 2.0.1 rodando no Docker
-Soma inicial: 46.36
-Soma após 10 passos: 16.16
+TerraME 2.0.1 running in Docker
+Initial sum: 46.36
+Sum after 10 steps: 16.16
 OK!
 ```
 
@@ -102,8 +109,9 @@ docker compose up --build
 xhost -local:docker    # revoke access when you are done
 ```
 
-`docker-compose.yml` mounts `./models` to `/work` and passes your `DISPLAY` through. If your
-host has a GPU, uncomment the `devices: /dev/dri` block.
+This opens the TerraME launcher, from which you can pick a package, run its examples or
+configure a model. `docker-compose.yml` mounts `./models` to `/work` and passes your
+`DISPLAY` through. If your host has a GPU, uncomment the `devices: /dev/dri` block.
 
 ## Project structure
 
@@ -133,6 +141,7 @@ LuccME is not downloaded: it is kept in `luccme/` (unchanged copy of upstream co
   `dumb-init` because `xvfb-run` hangs when it runs as PID 1.
 - **`Could not connect to any X display`:** `DISPLAY` is set, but the container cannot reach
   the X server. Run `xhost +local:docker`, or unset `DISPLAY` to run headless.
+- **A headless run never ends:** the model opens a `Chart` or a `Map`; add `-autoclose`.
 - **Permission errors in `/work`:** use `--user "$(id -u):$(id -g)"`.
 
 ## License

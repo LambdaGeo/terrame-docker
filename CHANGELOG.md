@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.1] -- 2026-09-23
+
+### Fixed
+- `docker compose up` opens the TerraME launcher: the compose file now redeclares the
+  image entrypoint, which drops the default `CMD` (`-version`) that made the container
+  print the version and exit.
+- README: headless runs of models with a `Chart` or `Map` need `-autoclose`, or they
+  never end.
+- `dockerfile`: the usage comment pointed to an image that is not published
+  (`ghcr.io/lambdageo/terrame`); it now builds and runs the local `terrame-luccme` tag.
+
+### Changed
+- Everything is in English: READMEs, comments, messages of `harness.lua`,
+  `generate.sh` and `finalize.py`, the notes in `manifest.json`, and the
+  `hello_world.lua` output.
+- Goldens regenerated: `terrame.log` and `manifest.json` carry the English messages;
+  the CSVs agree with 0.1.0 within 1e-12 (rounding of the 12th decimal place).
+- `benchmark/README.md` no longer says disslucc copies every golden.
+
 ## [0.1.0] -- 2026-09-23
 
 First tagged version.

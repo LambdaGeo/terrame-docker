@@ -1,5 +1,5 @@
-# Interface gráfica usando o X11 do host (Linux). Antes: xhost +local:docker
-# Para rodar sem tela, use docker run direto (ver dockerfile).
+# Graphical interface through the host's X11 (Linux). First: xhost +local:docker
+# For headless runs, use docker run directly (see readme.md).
 services:
   terrame:
     build: .
@@ -11,7 +11,10 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ./models:/work
+    # Same entrypoint as the image, redeclared to drop the default CMD (-version):
+    # with no arguments, TerraME opens its graphical launcher.
+    entrypoint: ["/usr/bin/dumb-init", "--", "/usr/local/bin/terrame-entrypoint"]
     network_mode: host
-    # Com GPU disponível no host, descomente:
+    # With a GPU on the host, uncomment:
     # devices:
     #   - /dev/dri:/dev/dri
