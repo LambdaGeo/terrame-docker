@@ -7,11 +7,10 @@ TerraME's official Linux binary was built for Ubuntu 18.04 and no longer runs on
 distributions. This image packages that binary with everything it needs, so the same model
 runs the same way on any machine with Docker.
 
-- **Headless by default:** with no `DISPLAY`, TerraME runs on a virtual X server (Xvfb). This
-  works on servers, in CI, and for batch runs.
-- **Optional GUI:** with an X11 display from the host, the TerraME interface opens normally.
-- **Reproducible:** the TerraME binary is checked against a SHA-256 hash and LuccME is pinned to
-  a fixed commit.
+- **Headless by default:** runs on a virtual X server (Xvfb) when no display is attached. Works on Linux, macOS, Windows, remote servers, and CI.
+- **Optional GUI:** opens the graphical interface with host X11 display forwarding.
+- **Shell access:** open an interactive `bash` shell to inspect files and test scripts directly.
+- **Reproducible:** the TerraME binary is checked against a SHA-256 hash and LuccME is pinned to a fixed commit.
 
 ## What's inside
 
@@ -24,76 +23,178 @@ runs the same way on any machine with Docker.
 | LuccME    | 3.1 (commit `6244dd4`) |
 | Packages  | `base`, `gis`, `luadoc`, `luccme` |
 
-## Build
+---
+
+## Quick Start (Docker Compose - Recommended)
+
+Docker Compose is the simplest way to run models without typing long volume mounts and user flags.
+
+### 1. Build or download the image
 
 ```bash
 git clone https://github.com/LambdaGeo/terrame-docker
 cd terrame-docker
-docker build -t terrame-luccme .
+docker compose build
 ```
 
-## Run a model (headless)
-
-Mount the folder that holds your model to `/work`, which is the container's working
-directory. Output files are written there as well.
+### 2. Run the quick test
 
 ```bash
-docker run --rm -v "$PWD":/work terrame-luccme my_model.lua
+docker compose up
 ```
 
-A model that opens a `Chart` or a `Map` keeps running after the simulation ends, waiting
-for someone to close the window. Headless, nobody will, so add `-autoclose`:
-
-```bash
-docker run --rm -v "$PWD":/work terrame-luccme -autoclose my_model.lua
-```
-
-To make the output files belong to your own user instead of UID 1000:
-
-```bash
-docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/work terrame-luccme my_model.lua
-```
-
-## Quick test: hello world
-
-`models/hello_world.lua` is a minimal model with no charts or maps: a 10x10 cellular space
-whose values decay for 10 steps. Use it to check that the image works:
-
-```bash
-docker run --rm terrame-luccme          # prints the versions (default command)
-docker run --rm -v "$PWD/models":/work terrame-luccme hello_world.lua
-```
-
-Expected output:
-
-```
+This runs the default `hello_world.lua` model in `./models` headlessly and prints the output:
+```text
 TerraME 2.0.1 running in Docker
-Initial sum: 46.36
-Sum after 10 steps: 16.16
+Initial sum: 49.83
+Sum after 10 steps: 17.37
 OK!
 ```
 
-The sums change from run to run because the initial values are random. To write your own
-model, copy `hello_world.lua` to a folder, edit it, and mount that folder to `/work`.
+### 3. Run a LuccME model
 
-## Run the LuccME test suite
+```bash
+docker compose run --rm terrame luccme_sample.lua
+```
+
+This runs a 3-year land use simulation (forest vs. deforestation) in Acre using the bundled `luccme` dataset.
+
+### 4. Run your own model
+
+#### A. Running models placed inside `./models/`
+Place your `.lua` script (and data) inside the `./models/` directory, then run:
+
+```bash
+docker compose run --rm terrame my_model.lua
+```
+
+#### B. Running models from an external folder (outside `./models`)
+If your model and datasets are located in another directory on your machine (e.g. `/home/user/my_project`), you don't need to move or copy them into `./models`:
+
+**With Docker Compose:**
+```bash
+WORK_DIR="/path/to/my_project" docker compose run --rm terrame my_model.lua
+```
+
+> **Tip:** If running multiple times in the same terminal, you can set `export WORK_DIR="/path/to/my_project"` once, or create a `.env` file containing `WORK_DIR=/path/to/my_project`.
+
+**With Docker CLI (`docker run`) directly from your project folder:**
+Navigate to your project's directory and mount `$PWD` to `/work`:
+```bash
+cd /path/to/my_project
+docker run --rm -v "$PWD":/work terrame-luccme my_model.lua
+```
+
+> **Tip:** If your model opens a `Chart` or `Map`, pass `-autoclose` so it exits when finished:
+> ```bash
+> docker compose run --rm terrame -autoclose my_model.lua
+> ```
+
+### 5. Open an interactive shell (Bash)
+
+To inspect files, check installed packages, or run commands interactively:
+
+```bash
+docker compose run --rm terrame bash
+```
+
+---
+
+## Running with Docker CLI (`docker run`)
+
+If you prefer using `docker run` directly:
+
+### Build
+
+```bash
+docker build -t terrame-luccme .
+```
+
+### Check version
+
+```bash
+docker run --rm terrame-luccme
+```
+
+### Run a model (headless)
+
+Mount the directory containing your model to `/work` (the container's working directory). Outputs are written there as well:
+
+```bash
+docker run --rm -v "$PWD/models":/work terrame-luccme hello_world.lua
+docker run --rm -v "$PWD/models":/work terrame-luccme luccme_sample.lua
+```
+
+To run models from your current directory and ensure created files belong to your host user:
+
+```bash
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/work terrame-luccme -autoclose my_model.lua
+```
+
+### Interactive shell
+
+```bash
+docker run --rm -it -v "$PWD/models":/work terrame-luccme bash
+```
+
+---
+
+## Example Models (`models/`)
+
+The repository includes ready-to-run examples in [`models/`](file:///home/sergio/Documents/develop/github/lambdageo/terrame-docker/models):
+
+- **[`models/hello_world.lua`](file:///home/sergio/Documents/develop/github/lambdageo/terrame-docker/models/hello_world.lua):** Minimal CellularSpace model. A 10x10 grid with random initial values that decay 10% each step for 10 steps.
+- **[`models/luccme_sample.lua`](file:///home/sergio/Documents/develop/github/lambdageo/terrame-docker/models/luccme_sample.lua):** A self-contained LuccME simulation model. Demonstrates loading GIS layers (`csAC.shp`), setting up land use categories (`f`, `d`, `outros`), calculating demand, potential linear regression, clue-like allocation, and stepping through time.
+
+---
+
+## Graphical Interface (GUI / X11 on Linux)
+
+To use TerraME's graphical launcher or display maps and charts interactively on a Linux host with X11:
+
+```bash
+# 1. Authorize local docker containers to connect to host X server
+xhost +local:docker
+
+# 2. Launch the GUI
+docker compose --profile gui run --rm terrame-gui
+
+# 3. Revoke access when finished
+xhost -local:docker
+```
+
+Or using `docker run`:
+
+```bash
+xhost +local:docker
+docker run --rm -it \
+  -e DISPLAY="$DISPLAY" \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v "$PWD/models":/work \
+  --network host \
+  terrame-luccme
+xhost -local:docker
+```
+
+---
+
+## Run the LuccME Test Suite
 
 ```bash
 echo 'directory = "functional"' > cfg.lua
-docker run --rm -v "$PWD":/work terrame-luccme -package luccme -test cfg.lua
+docker compose run --rm terrame -package luccme -test cfg.lua
 ```
 
-The 21 functional tests (`lab01` to `lab21`) finish in about 1.5 minutes. On a first run in an
-empty folder the report lists "2 problems": these are the `Lab09Console.txt` and
-`Lab18Console.txt` files that those tests create. They are not simulation failures.
+The 21 functional tests (`lab01` to `lab21`) complete in about 1.5 minutes. On a first run in an empty directory, the report lists "2 problems": these are the `Lab09Console.txt` and `Lab18Console.txt` log files generated by those tests and are not simulation failures.
+
+---
 
 ## LuccME goldens (reference results)
 
 `benchmark/` holds year-by-year reference results of TerraME/LuccME, used to validate
 ports of LuccME such as [disslucc](https://github.com/dissmodel/disslucc): the 21
 functional tests of the LuccME package plus two reference scripts that exercise the
-convergence loop. Each golden has the state of every cell at the end of every year, the
-TerraME log and a manifest with versions and hashes. See `benchmark/README.md`.
+convergence loop. See [`benchmark/README.md`](file:///home/sergio/Documents/develop/github/lambdageo/terrame-docker/benchmark/README.md).
 
 ```bash
 docker build -t terrame-luccme .
@@ -101,48 +202,39 @@ benchmark/generate.sh                      # all 23 goldens (about 3 minutes)
 benchmark/generate.sh lab01 lab15_md10     # only some
 ```
 
-## Graphical interface (Linux host with X11)
+---
 
-```bash
-xhost +local:docker
-docker compose up --build
-xhost -local:docker    # revoke access when you are done
-```
-
-This opens the TerraME launcher, from which you can pick a package, run its examples or
-configure a model. `docker-compose.yml` mounts `./models` to `/work` and passes your
-`DISPLAY` through. If your host has a GPU, uncomment the `devices: /dev/dri` block.
-
-## Project structure
+## Project Structure
 
 ```
 .
 ├── dockerfile            # Image: Ubuntu 18.04 + TerraME 2.0.1 + LuccME
-├── entrypoint.sh         # Uses Xvfb when there is no DISPLAY, the host X11 otherwise
-├── docker-compose.yml    # GUI mode
+├── entrypoint.sh         # Headless Xvfb / host X11 detection + shell execution support
+├── docker-compose.yml    # Headless (default) and GUI profiles
 ├── luccme/               # LuccME 3.1, pinned copy of TerraME/luccme@6244dd4
-├── benchmark/            # goldens of the LuccME labs + reference scripts and generator
+├── benchmark/            # Goldens of LuccME labs + reference scripts and generator
 ├── CHANGELOG.md
-└── models/               # hello_world.lua: minimal model to test the image
+└── models/               # Sample models
+    ├── hello_world.lua   # Minimal CellularSpace test model
+    └── luccme_sample.lua # Complete LuccME simulation example
 ```
 
-## Build options
-
-| Build arg          | Default | Purpose |
-|--------------------|---------|---------|
-| `TERRAME_VERSION`  | `2.0.1` | TerraME release |
-| `TERRAME_SHA256`   | hash of 2.0.1 | Checksum of the release tarball |
-
-LuccME is not downloaded: it is kept in `luccme/` (unchanged copy of upstream commit `6244dd4`, see `luccme/UPSTREAM.md`) as the reference implementation for validating disslucc.
+---
 
 ## Troubleshooting
 
-- **The container hangs with no output:** do not replace the image entrypoint. It starts under
-  `dumb-init` because `xvfb-run` hangs when it runs as PID 1.
-- **`Could not connect to any X display`:** `DISPLAY` is set, but the container cannot reach
-  the X server. Run `xhost +local:docker`, or unset `DISPLAY` to run headless.
-- **A headless run never ends:** the model opens a `Chart` or a `Map`; add `-autoclose`.
-- **Permission errors in `/work`:** use `--user "$(id -u):$(id -g)"`.
+- **`File '/work/bash' does not exist`:** The entrypoint now automatically supports running `bash` or `sh`. Rebuild your image (`docker compose build`) if you see this error.
+- **`Could not connect to any X display`:**
+  - If you intended to run **headless**, use the default `terrame` service: `docker compose run --rm terrame <model.lua>` (it uses virtual Xvfb automatically).
+  - If you intended to run **GUI**, remember to run `xhost +local:docker` on your host before starting `terrame-gui`.
+- **A headless run never ends:** The model opens a `Chart` or a `Map` that waits for a user to close the window. Add `-autoclose` to your command:
+  ```bash
+  docker compose run --rm terrame -autoclose my_model.lua
+  ```
+- **Permission errors in `/work`:** Files created by the container in mounted volumes may be owned by UID 1000. If your host user has a different UID/GID, pass `--user "$(id -u):$(id -g)"` to `docker run`.
+- **The container hangs with no output:** Do not override the image entrypoint with custom wrappers unless necessary; `dumb-init` is required because `xvfb-run` hangs when run directly as PID 1.
+
+---
 
 ## License
 

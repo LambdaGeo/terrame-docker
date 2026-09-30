@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `docker-compose.yml` headless service (`terrame`) as default: running `docker compose up` now runs a working model out of the box.
+- Support for interactive shell (`bash` / `sh`) directly via entrypoint without `File '/work/bash' does not exist` error.
+- Support for `WORK_DIR` environment variable in `docker-compose.yml` to run models from external directories.
+- `models/luccme_sample.lua`: self-contained LuccME simulation example model using bundled test dataset.
+- Dedicated `terrame-gui` profile for GUI runs via Docker Compose.
+
+### Changed
+- `readme.md`: comprehensive overhaul with quickstart, Docker Compose examples, model descriptions, and troubleshooting.
+
 ## [0.1.1] -- 2026-09-23
 
 ### Fixed
