@@ -1,7 +1,41 @@
-# Graphical interface through the host's X11 (Linux). First: xhost +local:docker
-# For headless runs, use docker run directly (see readme.md).
+# TerraME 2.0.1 + LuccME Docker Compose
+#
+# Common commands:
+#   - Run default test model:
+#       docker compose up
+#
+#   - Run any model in ./models (headless):
+#       docker compose run --rm terrame hello_world.lua
+#       docker compose run --rm terrame luccme_sample.lua
+#       docker compose run --rm terrame -autoclose my_model.lua
+#
+#   - Open interactive shell (bash) inside container:
+#       docker compose run --rm terrame bash
+#
+#   - Run models from a custom directory:
+#       WORK_DIR=/path/to/folder docker compose run --rm terrame my_model.lua
+#
+#   - Run the LuccME test suite:
+#       docker compose run --rm terrame -package luccme -test cfg.lua
+#
+#   - Graphical interface (Linux host with X11):
+#       xhost +local:docker
+#       docker compose run --rm terrame-gui
+#       xhost -local:docker
+
 services:
+  # Headless service (default): works in CI, servers, Linux, macOS and Windows
   terrame:
+    build: .
+    image: terrame-luccme:latest
+    volumes:
+      - ${WORK_DIR:-./models}:/work
+    command: ["hello_world.lua"]
+
+  # Graphical interface service (Linux host with X11)
+  # Run with: docker compose --profile gui run --rm terrame-gui
+  terrame-gui:
+    profiles: ["gui"]
     build: .
     image: terrame-luccme:latest
     environment:
@@ -10,11 +44,9 @@ services:
       - QT_X11_NO_MITSHM=1
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./models:/work
-    # Same entrypoint as the image, redeclared to drop the default CMD (-version):
-    # with no arguments, TerraME opens its graphical launcher.
-    entrypoint: ["/usr/bin/dumb-init", "--", "/usr/local/bin/terrame-entrypoint"]
+      - ${WORK_DIR:-./models}:/work
     network_mode: host
+    entrypoint: ["/usr/bin/dumb-init", "--", "/usr/local/bin/terrame-entrypoint"]
     # With a GPU on the host, uncomment:
     # devices:
     #   - /dev/dri:/dev/dri

@@ -11,6 +11,16 @@ fi
 export XDG_RUNTIME_DIR="/tmp/runtime-$(id -u)"
 mkdir -p "$XDG_RUNTIME_DIR" && chmod 0700 "$XDG_RUNTIME_DIR"
 
+# Allow running an interactive shell or custom commands directly
+if [ "$1" = "bash" ] || [ "$1" = "sh" ] || [ "$1" = "/bin/bash" ] || [ "$1" = "/bin/sh" ]; then
+    exec "$@"
+fi
+
+# If first argument is 'terrame', strip it
+if [ "$1" = "terrame" ] || [ "$1" = "/opt/terrame/bin/terrame" ]; then
+    shift
+fi
+
 if [ -z "$DISPLAY" ]; then
     # No display: virtual X server (servers, CI, batch runs)
     exec xvfb-run -a -s "-screen 0 1280x1024x24" /opt/terrame/bin/terrame "$@"
