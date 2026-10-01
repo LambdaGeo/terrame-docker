@@ -27,7 +27,7 @@ services:
   # Headless service (default): works in CI, servers, Linux, macOS and Windows
   terrame:
     build: .
-    image: terrame-luccme:latest
+    image: lambdageo/terrame-luccme:latest
     volumes:
       - ${WORK_DIR:-./models}:/work
     command: ["hello_world.lua"]
@@ -37,7 +37,7 @@ services:
   terrame-gui:
     profiles: ["gui"]
     build: .
-    image: terrame-luccme:latest
+    image: lambdageo/terrame-luccme:latest
     environment:
       - DISPLAY=${DISPLAY}
       - LIBGL_ALWAYS_SOFTWARE=1

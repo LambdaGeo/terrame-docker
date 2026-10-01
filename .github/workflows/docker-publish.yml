@@ -1,0 +1,107 @@
+# Builds, smoke-tests and publishes the image to Docker Hub.
+#
+#   - Pull requests / manual runs: build + smoke test only (nothing is pushed).
+#   - Tag push (1.2.3 or v1.2.3):   build + smoke test + push + sync Docker Hub description.
+#
+# Required repository secrets (Settings > Secrets and variables > Actions):
+#   DOCKERHUB_USERNAME   Docker Hub user or organization member that can push
+#   DOCKERHUB_TOKEN      Docker Hub access token (Read, Write, Delete scope: needed to
+#                        update the repository description)
+
+name: Docker publish
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  pull_request:
+    paths:
+      - Dockerfile
+      - entrypoint.sh
+      - luccme/**
+      - models/**
+      - .github/workflows/docker-publish.yml
+  workflow_dispatch:
+
+env:
+  IMAGE: lambdageo/terrame-luccme
+
+concurrency:
+  group: docker-publish-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Image tags and labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=sha,prefix=sha-,enable=${{ !startsWith(github.ref, 'refs/tags/') }}
+
+      # The TerraME binary is x86_64 only, so a single platform is built.
+      - name: Build (local, for the smoke test)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: ${{ env.IMAGE }}:test
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test - TerraME
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/models":/work \
+            "$IMAGE:test" hello_world.lua | tee out.txt
+          grep -q "^OK!" out.txt
+
+      - name: Smoke test - LuccME
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/models":/work \
+            "$IMAGE:test" luccme_sample.lua | tee out.txt
+          grep -q "LuccME simulation finished successfully!" out.txt
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+
+      - name: Sync Docker Hub description
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ env.IMAGE }}
+          short-description: TerraME 2.0.1 with the LuccME package, headless or with a graphical interface
+          readme-filepath: ./readme.md

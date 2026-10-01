@@ -1,2 +1,3 @@
-__pycache__/
-*.pyc
+# TerraME output generated when running models locally
+t3mp.tview
+*.tview

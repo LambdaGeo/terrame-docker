@@ -1,7 +1,7 @@
 # TerraME 2.0.1 + LuccME, ready to run on any Linux/macOS/Windows machine with Docker.
 #
-#   docker build -t terrame-luccme .
-#   docker run --rm -v "$PWD":/work terrame-luccme my_model.lua
+#   docker pull lambdageo/terrame-luccme     (or: docker build -t lambdageo/terrame-luccme .)
+#   docker run --rm -v "$PWD":/work lambdageo/terrame-luccme my_model.lua
 #
 # Without DISPLAY, TerraME runs on a virtual X server (Xvfb): servers, CI and batch
 # runs. With DISPLAY (see docker-compose.yml) it opens the graphical interface.

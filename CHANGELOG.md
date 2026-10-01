@@ -9,7 +9,16 @@
 - `models/luccme_sample.lua`: self-contained LuccME simulation example model using bundled test dataset.
 - Dedicated `terrame-gui` profile for GUI runs via Docker Compose.
 
+- `.github/workflows/docker-publish.yml`: builds and smoke-tests the image on pull requests; on a version tag (`1.2.3` or `v1.2.3`) it also pushes `lambdageo/terrame-luccme` to Docker Hub and syncs the repository description.
+
+### Removed
+- `benchmark/` (LuccME goldens, reference scripts and generator): not needed to use the image.
+
 ### Changed
+- Image name is now `lambdageo/terrame-luccme` (compose, README, model usage comments) for Docker Hub.
+- `dockerfile` renamed to `Dockerfile`.
+- `luccme/UPSTREAM.md` no longer mentions the benchmark use.
+- `.dockerignore`/`.gitignore`: dropped benchmark and Python entries.
 - `readme.md`: comprehensive overhaul with quickstart, Docker Compose examples, model descriptions, and troubleshooting.
 
 ## [0.1.1] -- 2026-09-23

@@ -1,6 +1,6 @@
 -- Minimal LuccME example model
 -- Usage: docker compose run --rm terrame luccme_sample.lua
---    or: docker run --rm -v "$PWD/models":/work terrame-luccme luccme_sample.lua
+--    or: docker run --rm -v "$PWD/models":/work lambdageo/terrame-luccme luccme_sample.lua
 
 import("gis")
 import("luccme")

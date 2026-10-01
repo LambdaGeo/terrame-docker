@@ -1,5 +1,5 @@
 -- TerraME hello world: checks that the image works.
--- Usage: docker run --rm -v "$PWD/models":/work terrame-luccme hello_world.lua
+-- Usage: docker run --rm -v "$PWD/models":/work lambdageo/terrame-luccme hello_world.lua
 
 print("TerraME " .. packageInfo("base").version .. " running in Docker")
 

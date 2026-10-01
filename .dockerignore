@@ -1,2 +1,5 @@
-benchmark/
 .git/
+.gitignore
+.dockerignore
+*.md
+!luccme/**/*.md
