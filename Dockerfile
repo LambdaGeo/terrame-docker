@@ -1,7 +1,7 @@
 # TerraME 2.0.1 + LuccME, ready to run on any Linux/macOS/Windows machine with Docker.
 #
-#   docker pull lambdageo/terrame-luccme     (or: docker build -t lambdageo/terrame-luccme .)
-#   docker run --rm -v "$PWD":/work lambdageo/terrame-luccme my_model.lua
+#   docker pull profsergiocosta/terrame-luccme     (or: docker build -t profsergiocosta/terrame-luccme .)
+#   docker run --rm -v "$PWD":/work profsergiocosta/terrame-luccme my_model.lua
 #
 # Without DISPLAY, TerraME runs on a virtual X server (Xvfb): servers, CI and batch
 # runs. With DISPLAY (see docker-compose.yml) it opens the graphical interface.
@@ -82,7 +82,7 @@ RUN chmod 0755 /usr/local/bin/terrame-entrypoint \
 
 LABEL org.opencontainers.image.title="TerraME + LuccME" \
       org.opencontainers.image.description="TerraME 2.0.1 with the LuccME package, headless or with a graphical interface" \
-      org.opencontainers.image.source="https://github.com/LambdaGeo/terrame-docker" \
+      org.opencontainers.image.source="https://github.com/profsergiocosta/terrame-docker" \
       org.opencontainers.image.licenses="LGPL-3.0"
 
 USER terrame

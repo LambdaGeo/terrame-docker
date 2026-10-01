@@ -25,7 +25,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE: lambdageo/terrame-luccme
+  IMAGE: profsergiocosta/terrame-luccme
 
 concurrency:
   group: docker-publish-${{ github.ref }}

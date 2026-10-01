@@ -9,13 +9,13 @@
 - `models/luccme_sample.lua`: self-contained LuccME simulation example model using bundled test dataset.
 - Dedicated `terrame-gui` profile for GUI runs via Docker Compose.
 
-- `.github/workflows/docker-publish.yml`: builds and smoke-tests the image on pull requests; on a version tag (`1.2.3` or `v1.2.3`) it also pushes `lambdageo/terrame-luccme` to Docker Hub and syncs the repository description.
+- `.github/workflows/docker-publish.yml`: builds and smoke-tests the image on pull requests; on a version tag (`1.2.3` or `v1.2.3`) it also pushes `profsergiocosta/terrame-luccme` to Docker Hub and syncs the repository description.
 
 ### Removed
 - `benchmark/` (LuccME goldens, reference scripts and generator): not needed to use the image.
 
 ### Changed
-- Image name is now `lambdageo/terrame-luccme` (compose, README, model usage comments) for Docker Hub.
+- Image name is now `profsergiocosta/terrame-luccme` (compose, README, model usage comments) for Docker Hub.
 - `dockerfile` renamed to `Dockerfile`.
 - `luccme/UPSTREAM.md` no longer mentions the benchmark use.
 - `.dockerignore`/`.gitignore`: dropped benchmark and Python entries.
@@ -30,7 +30,7 @@
 - README: headless runs of models with a `Chart` or `Map` need `-autoclose`, or they
   never end.
 - `dockerfile`: the usage comment pointed to an image that is not published
-  (`ghcr.io/lambdageo/terrame`); it now builds and runs the local `terrame-luccme` tag.
+  (`ghcr.io/profsergiocosta/terrame`); it now builds and runs the local `terrame-luccme` tag.
 
 ### Changed
 - Everything is in English: READMEs, comments, messages of `harness.lua`,

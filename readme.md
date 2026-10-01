@@ -34,13 +34,13 @@ Docker Compose is the simplest way to run models without typing long volume moun
 Pull the published image:
 
 ```bash
-docker pull lambdageo/terrame-luccme
+docker pull profsergiocosta/terrame-luccme
 ```
 
 or build it from source:
 
 ```bash
-git clone https://github.com/LambdaGeo/terrame-docker
+git clone https://github.com/profsergiocosta/terrame-docker
 cd terrame-docker
 docker compose build
 ```
@@ -90,7 +90,7 @@ WORK_DIR="/path/to/my_project" docker compose run --rm terrame my_model.lua
 Navigate to your project's directory and mount `$PWD` to `/work`:
 ```bash
 cd /path/to/my_project
-docker run --rm -v "$PWD":/work lambdageo/terrame-luccme my_model.lua
+docker run --rm -v "$PWD":/work profsergiocosta/terrame-luccme my_model.lua
 ```
 
 > **Tip:** If your model opens a `Chart` or `Map`, pass `-autoclose` so it exits when finished:
@@ -115,15 +115,15 @@ If you prefer using `docker run` directly:
 ### Get the image
 
 ```bash
-docker pull lambdageo/terrame-luccme
+docker pull profsergiocosta/terrame-luccme
 # or, from a clone of this repository:
-docker build -t lambdageo/terrame-luccme .
+docker build -t profsergiocosta/terrame-luccme .
 ```
 
 ### Check version
 
 ```bash
-docker run --rm lambdageo/terrame-luccme
+docker run --rm profsergiocosta/terrame-luccme
 ```
 
 ### Run a model (headless)
@@ -131,20 +131,20 @@ docker run --rm lambdageo/terrame-luccme
 Mount the directory containing your model to `/work` (the container's working directory). Outputs are written there as well:
 
 ```bash
-docker run --rm -v "$PWD/models":/work lambdageo/terrame-luccme hello_world.lua
-docker run --rm -v "$PWD/models":/work lambdageo/terrame-luccme luccme_sample.lua
+docker run --rm -v "$PWD/models":/work profsergiocosta/terrame-luccme hello_world.lua
+docker run --rm -v "$PWD/models":/work profsergiocosta/terrame-luccme luccme_sample.lua
 ```
 
 To run models from your current directory and ensure created files belong to your host user:
 
 ```bash
-docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/work lambdageo/terrame-luccme -autoclose my_model.lua
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/work profsergiocosta/terrame-luccme -autoclose my_model.lua
 ```
 
 ### Interactive shell
 
 ```bash
-docker run --rm -it -v "$PWD/models":/work lambdageo/terrame-luccme bash
+docker run --rm -it -v "$PWD/models":/work profsergiocosta/terrame-luccme bash
 ```
 
 ---
@@ -182,7 +182,7 @@ docker run --rm -it \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v "$PWD/models":/work \
   --network host \
-  lambdageo/terrame-luccme
+  profsergiocosta/terrame-luccme
 xhost -local:docker
 ```
 
