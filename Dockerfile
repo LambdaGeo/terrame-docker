@@ -83,7 +83,7 @@ RUN chmod 0755 /usr/local/bin/terrame-entrypoint \
 LABEL org.opencontainers.image.title="TerraME + LuccME" \
       org.opencontainers.image.description="TerraME 2.0.1 with the LuccME package, headless or with a graphical interface" \
       org.opencontainers.image.source="https://github.com/profsergiocosta/terrame-docker" \
-      org.opencontainers.image.licenses="LGPL-3.0"
+      org.opencontainers.image.licenses="MIT AND LGPL-3.0"
 
 USER terrame
 WORKDIR /work

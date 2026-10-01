@@ -2,17 +2,30 @@
 
 ## [Unreleased]
 
+## [0.4.1] -- 2026-10-01
+
+### Added
+- `LICENSE`: MIT License for the files of this repository. `luccme/` keeps its own LGPL-3.0 license files.
+- `CITATION.cff` and a Citation section in the readme.
+
+### Changed
+- Image license label is now `MIT AND LGPL-3.0` (takes effect in the next published version).
+
+## [0.4.0] -- 2026-09-30
+
+First version published on Docker Hub as `profsergiocosta/terrame-luccme`. The tags `v0.2.0` and
+`v0.3.0` were created while setting up publishing; no image was published under them.
+
 ### Added
 - `docker-compose.yml` headless service (`terrame`) as default: running `docker compose up` now runs a working model out of the box.
 - Support for interactive shell (`bash` / `sh`) directly via entrypoint without `File '/work/bash' does not exist` error.
 - Support for `WORK_DIR` environment variable in `docker-compose.yml` to run models from external directories.
 - `models/luccme_sample.lua`: self-contained LuccME simulation example model using bundled test dataset.
 - Dedicated `terrame-gui` profile for GUI runs via Docker Compose.
-
 - `.github/workflows/docker-publish.yml`: builds and smoke-tests the image on pull requests; on a version tag (`1.2.3` or `v1.2.3`) it also pushes `profsergiocosta/terrame-luccme` to Docker Hub and syncs the repository description.
 
 ### Removed
-- `benchmark/` (LuccME goldens, reference scripts and generator): not needed to use the image.
+- `benchmark/` (LuccME goldens, reference scripts and generator): moved to https://github.com/LambdaGeo/disslucc-benchmark, which uses this image.
 
 ### Changed
 - Image name is now `profsergiocosta/terrame-luccme` (compose, README, model usage comments) for Docker Hub.

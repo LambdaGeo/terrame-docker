@@ -45,6 +45,10 @@ cd terrame-docker
 docker compose build
 ```
 
+`latest` follows the newest release; `X.Y.Z` and `X.Y` are fixed versions. For reproducible
+results, pin one (for example `profsergiocosta/terrame-luccme:0.4.0`), see the
+[available tags](https://hub.docker.com/r/profsergiocosta/terrame-luccme/tags).
+
 ### 2. Run the quick test
 
 ```bash
@@ -151,10 +155,10 @@ docker run --rm -it -v "$PWD/models":/work profsergiocosta/terrame-luccme bash
 
 ## Example Models (`models/`)
 
-The repository includes ready-to-run examples in [`models/`](models):
+The repository includes ready-to-run examples in [`models/`](https://github.com/profsergiocosta/terrame-docker/tree/main/models):
 
-- **[`models/hello_world.lua`](models/hello_world.lua):** Minimal CellularSpace model. A 10x10 grid with random initial values that decay 10% each step for 10 steps.
-- **[`models/luccme_sample.lua`](models/luccme_sample.lua):** A self-contained LuccME simulation model. Demonstrates loading GIS layers (`csAC.shp`), setting up land use categories (`f`, `d`, `outros`), calculating demand, potential linear regression, clue-like allocation, and stepping through time.
+- **[`models/hello_world.lua`](https://github.com/profsergiocosta/terrame-docker/blob/main/models/hello_world.lua):** Minimal CellularSpace model. A 10x10 grid with random initial values that decay 10% each step for 10 steps.
+- **[`models/luccme_sample.lua`](https://github.com/profsergiocosta/terrame-docker/blob/main/models/luccme_sample.lua):** A self-contained LuccME simulation model. Demonstrates loading GIS layers (`csAC.shp`), setting up land use categories (`f`, `d`, `outros`), calculating demand, potential linear regression, clue-like allocation, and stepping through time.
 
 ---
 
@@ -230,20 +234,39 @@ The 21 functional tests (`lab01` to `lab21`) complete in about 1.5 minutes. On a
 
 ---
 
+## Benchmark
+
+Year-by-year LuccME reference results (goldens) generated with this image, and the scripts to
+verify them, live in [disslucc-benchmark](https://github.com/LambdaGeo/disslucc-benchmark).
+
+---
+
 ## Publishing (maintainers)
 
 Pushing a version tag publishes the image through GitHub Actions (build, smoke test with both sample models, push, Docker Hub description sync):
 
 ```bash
-git tag 0.2.0 && git push origin 0.2.0
+git tag v0.5.0 && git push origin v0.5.0
 ```
 
-Required repository secrets: `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (access token with Read, Write, Delete scope). Tags pushed: `0.2.0`, `0.2` and `latest`.
+Required repository secrets: `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (access token with Read, Write, Delete scope). A tag `vX.Y.Z` (or `X.Y.Z`) publishes `X.Y.Z`, `X.Y` and `latest`. Close the `Unreleased` section of `CHANGELOG.md` before tagging.
+
+## Citation
+
+If you use this image in your research, please cite it. GitHub's "Cite this repository" button
+(from [`CITATION.cff`](CITATION.cff)) gives the reference in APA and BibTeX. Please also cite
+TerraME and LuccME, as described in their repositories.
 
 ---
 
 ## License
 
-TerraME and LuccME are distributed under LGPL-3.0 by INPE. See their repositories for details.
+The files of this repository (Dockerfile, entrypoint, compose file, sample models, workflows and
+documentation) are released under the [MIT License](LICENSE).
+
+The image also contains third-party software under its own licenses, which are not changed by
+this repository: [TerraME](https://github.com/TerraME/terrame) and the
+[LuccME](https://github.com/TerraME/luccme) package (`luccme/`, kept unchanged with its own
+license files) are distributed under LGPL-3.0 by INPE. See their repositories for details.
 
 Maintained by the [LambdaGeo](https://github.com/LambdaGeo) research group (UFMA).

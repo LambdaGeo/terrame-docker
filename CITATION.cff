@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this image in your research, please cite it as below."
+type: software
+title: "terrame-docker: TerraME and LuccME in a Docker image"
+abstract: >-
+  Docker image of TerraME 2.0.1 with the LuccME 3.1 package, running headless by
+  default (Xvfb) or with a graphical interface, to run the same land use change
+  models reproducibly on any machine with Docker.
+authors:
+  - given-names: "Sérgio Souza"
+    family-names: "Costa"
+    affiliation: "Universidade Federal do Maranhão (UFMA), LambdaGeo Research Group"
+version: 0.4.1
+date-released: 2026-10-01
+license: MIT
+repository-code: "https://github.com/profsergiocosta/terrame-docker"
+url: "https://hub.docker.com/r/profsergiocosta/terrame-luccme"
+keywords:
+  - TerraME
+  - LuccME
+  - Docker
+  - land use change
+  - reproducibility
+  - geospatial modeling
